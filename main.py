@@ -6,7 +6,7 @@ from get_news import get_latest_news  # 需要你先完成 get_news.py
 import pandas as pd
 
 # ========== 配置区（改你私人的信息） ==========
-DEEPSEEK_API_KEY = "DEEPSEEK_API_KEY"   # 必填
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")   # 必填
 STOCK_CODES = [
     {"code": "000100", "market": "a"},
     {"code": "605020", "market": "a"},
@@ -14,7 +14,7 @@ STOCK_CODES = [
     {"code": "09992", "market": "hk"},
 ]
 # 推送方式二选一，把不用的留空字符串
-SERVERCHAN_SENDKEY = "SERVERCHAN_SENDKEY"          # Server酱 SendKey
+SERVERCHAN_SENDKEY = os.environ.get("SERVERCHAN_SENDKEY", "")          # Server酱 SendKey
 WECHAT_WEBHOOK_URL = ""         # 企业微信机器人 webhook
 # =============================================
 
