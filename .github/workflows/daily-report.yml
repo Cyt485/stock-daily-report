@@ -2,29 +2,34 @@ name: Daily Stock Report
 
 on:
   schedule:
-    # 北京时间每天早上8:30（UTC时间0:30）
-    - cron: '30 0 * * 1-5'   # 周一到周五
-  workflow_dispatch:  # 允许手动触发
+    # 北京时间每个交易日上午 8:30（UTC 1:00），根据市场开市时间调整
+    - cron: '0 1 * * 1-5'
+  workflow_dispatch:   # 支持手动触发，方便测试
 
 jobs:
-  run-script:
+  run-report:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    timeout-minutes: 10
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
       - name: Install dependencies
         run: |
-          pip install akshare openai requests pandas
+          pip install --upgrade pip
+          pip install pandas requests openai
+          # 如果你的 get_data.py 或 get_news.py 还有其他依赖，也在这里安装
+          # 比如 pip install akshare beautifulsoup4 等
 
-      - name: Run analysis
+      - name: Run stock report
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
           WECHAT_WEBHOOK_URL: ${{ secrets.WECHAT_WEBHOOK_URL }}
-        run: python main.py
+        run: python main.py   # 改成你的脚本文件名
