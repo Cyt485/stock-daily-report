@@ -1,23 +1,26 @@
 import os
 import requests
 from openai import OpenAI
-from get_data import get_stock_info   # 刚刚改好的统一函数
-from get_news import get_latest_news  # 需要你先完成 get_news.py
 from get_data import get_stock_info, get_industry_info
+from get_news import get_latest_news
 import pandas as pd
 
-# ========== 配置区（改你私人的信息） ==========
-DEEPSEEK_API_KEY = "DEEPSEEK_API_KEY"   # 必填
+# ========== 配置区（从 GitHub Secrets 注入环境变量） ==========
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 STOCK_CODES = [
     {"code": "000100", "market": "a"},
     {"code": "605020", "market": "a"},
     {"code": "00189", "market": "hk"},
     {"code": "09992", "market": "hk"},
 ]
-# 推送方式二选一，把不用的留空字符串
-SERVERCHAN_SENDKEY = "SERVERCHAN_SENDKEY"          # Server酱 SendKey
-WECHAT_WEBHOOK_URL = ""         # 企业微信机器人 webhook
-# =============================================
+SERVERCHAN_SENDKEY = os.getenv("SERVERCHAN_SENDKEY", "")
+WECHAT_WEBHOOK_URL = os.getenv("WECHAT_WEBHOOK_URL", "")
+
+# 检查必要配置是否缺失
+if not DEEPSEEK_API_KEY:
+    raise ValueError("❌ 环境变量 DEEPSEEK_API_KEY 未设置")
+# 推送方式至少配置一种，可自行决定是否强制检查
+# ==============================================
 
 client = OpenAI(
     api_key=DEEPSEEK_API_KEY,
@@ -105,7 +108,7 @@ def main():
                 *stock_prompts
             ],
             temperature=0.3,
-            max_tokens=800,
+            max_tokens=2000,
         )
         full_report = response.choices[0].message.content
         usage = response.usage
